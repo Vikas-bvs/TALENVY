@@ -1,0 +1,82 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class CompleteNumberGuessingGame {
+    public static void main(String[] args) {
+        // Initialize game components
+        Random random = new Random();
+        Scanner scanner = new Scanner(System.in);
+        
+        // Game configuration
+        final int MIN_RANGE = 1;
+        final int MAX_RANGE = 100;
+        final int MAX_ATTEMPTS = 10;
+        final int CLOSE_RANGE = 5;
+        
+        // Game variables
+        int secretNumber = random.nextInt(MAX_RANGE) + MIN_RANGE;
+        int userGuess;
+        int attempts = 0;
+        boolean hasWon = false;
+        
+        System.out.println("Welcome to the Number Guessing Game!");
+        System.out.printf("I've chosen a number between %d and %d. You have %d tries to guess it!\n\n", 
+                         MIN_RANGE, MAX_RANGE, MAX_ATTEMPTS);
+
+        // Main game loop
+        while (attempts < MAX_ATTEMPTS && !hasWon) {
+            System.out.printf("Attempt %d/%d - Enter your guess: ", (attempts + 1), MAX_ATTEMPTS);
+            
+            // Handle user input
+            try {
+                userGuess = scanner.nextInt();
+                attempts++;
+                
+                // Validate guess is within range
+                if (userGuess < MIN_RANGE || userGuess > MAX_RANGE) {
+                    System.out.printf("⚠️ Please enter a number between %d and %d!\n", MIN_RANGE, MAX_RANGE);
+                    continue;
+                }
+                
+                // Check guess against secret number
+                if (userGuess == secretNumber) {
+                    hasWon = true;
+                    System.out.printf("\n🎉 Congratulations! You guessed the correct number %d in %d %s!\n",
+                                    secretNumber, attempts, (attempts == 1) ? "try" : "tries");
+                } else {
+                    // Provide feedback
+                    String direction = (userGuess < secretNumber) ? "⬆️ Too low!" : "⬇️ Too high!";
+                    System.out.printf("%s The secret number is %s than %d\n",
+                                    direction, 
+                                    (userGuess < secretNumber) ? "higher" : "lower", 
+                                    userGuess);
+                    
+                    // Give proximity hint
+                    if (Math.abs(userGuess - secretNumber) <= CLOSE_RANGE) {
+                        System.out.println("🔥 You're getting very close!");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("⚠️ Invalid input! Please enter a whole number.");
+                scanner.next(); // Clear the invalid input
+            }
+        }
+        
+        // End game message if lost
+        if (!hasWon) {
+            System.out.printf("\n😢 Game over! The secret number was %d. Better luck next time!\n", secretNumber);
+        }
+        
+        // Ask to play again
+        System.out.print("\nWould you like to play again? (yes/no): ");
+        String playAgain = scanner.next().toLowerCase();
+        if (playAgain.equals("yes") || playAgain.equals("y")) {
+            System.out.println("\nStarting a new game...\n");
+            main(args); // Restart the game
+        } else {
+            System.out.println("\nThanks for playing! Goodbye!");
+        }
+        
+        scanner.close();
+    }
+}
